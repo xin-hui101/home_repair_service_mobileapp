@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "9973955190",
+    "project_id": "home-repair-service-booking",
+    "storage_bucket": "home-repair-service-booking.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:9973955190:android:0d360c0e37bd4041453d57",
+        "android_client_info": {
+          "package_name": "com.example.home_service_system"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfoUYKA8wxdY03WljQOGQuQcU-n2pDuSw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
