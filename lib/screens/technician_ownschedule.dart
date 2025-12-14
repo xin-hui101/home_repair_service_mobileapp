@@ -23,7 +23,7 @@ class _TechnicianOwnSchedulePageState extends State<TechnicianOwnSchedulePage> {
   int _selectedIndex = 0;
   DateTime _selectedDate = DateTime.now();
   bool _isLoading = true;
-  bool _isSidebarCollapsed = false;
+  bool _isSidebarCollapsed = true;
   bool _showNotifications = false;
   
   TechnicianModel? _technicianInfo;
@@ -93,6 +93,13 @@ Future<void> _initializeNotifications() async {
         date: date,
       );
       
+    bookings.sort((a, b) {
+     if (a.bookingTime.hour != b.bookingTime.hour) {
+    return a.bookingTime.hour.compareTo(b.bookingTime.hour);
+    }
+    return a.bookingTime.minute.compareTo(b.bookingTime.minute);
+    });
+
       print('=== Loaded ${bookings.length} bookings for ${date.toString()} ===');
       for (var booking in bookings) {
         print('Booking: ${booking.bookingID}, Status: ${booking.statusID}');

@@ -47,6 +47,7 @@ class _RegisterPageState extends State<RegisterPage> {
             padding: EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center, 
               children: [
                 Icon(
                   Icons.check_circle,
@@ -56,6 +57,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 SizedBox(height: 20),
                 Text(
                   'Registration Successful!',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,

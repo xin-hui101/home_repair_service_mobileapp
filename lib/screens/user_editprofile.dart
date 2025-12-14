@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:home_service_system/firebase_service/auth_service.dart';
 import 'package:home_service_system/firebase_service/storage_service.dart';
 import 'package:home_service_system/models/models.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -20,6 +21,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _addressController = TextEditingController();
+  final _currentPasswordController = TextEditingController();
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   
   bool _isLoading = false;
   bool _isInitialLoading = true;
@@ -44,6 +48,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _phoneController.dispose();
     _emailController.dispose();
     _addressController.dispose();
+    _currentPasswordController.dispose(); 
+    _newPasswordController.dispose();     
+    _confirmPasswordController.dispose(); 
     super.dispose();
   }
 
@@ -239,7 +246,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
            _emailController.text.trim() != currentUser!.email ||
            _addressController.text.trim() != (currentUser!.address ?? '') ||
            _selectedImage != null ||
-           _shouldRemoveImage;
+           _shouldRemoveImage ||
+          _currentPasswordController.text.isNotEmpty;
   }
 
   // UPDATED: 保存个人资料到Firebase with image upload
@@ -300,6 +308,41 @@ class _EditProfilePageState extends State<EditProfilePage> {
         profilePictureUrl = null;
       }
       
+          // 如果用户想修改密码
+    if (_currentPasswordController.text.isNotEmpty) {
+      try {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null && user.email != null) {
+          // 重新验证
+          final credential = EmailAuthProvider.credential(
+            email: user.email!,
+            password: _currentPasswordController.text,
+          );
+          await user.reauthenticateWithCredential(credential);
+          
+          // 修改密码
+          await user.updatePassword(_newPasswordController.text);
+          print('Password updated successfully');
+        }
+      } on FirebaseAuthException catch (e) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _isUploadingImage = false;
+          });
+          
+          String errorMessage = 'Failed to change password';
+          if (e.code == 'wrong-password') {
+            errorMessage = 'Current password is incorrect';
+          } else if (e.code == 'weak-password') {
+            errorMessage = 'New password is too weak';
+          }
+          
+          _showErrorMessage(errorMessage);
+          return; // 停止保存
+        }
+      }
+    }
       // 准备更新数据
       Map<String, dynamic> updateData = {
         'user_name': _nameController.text.trim(),
@@ -635,6 +678,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   label: 'Email Address',
                                   icon: Icons.email,
                                   keyboardType: TextInputType.emailAddress,
+                                  enabled: false,
                                   validator: _validateEmail,
                                 ),
                                 
@@ -653,8 +697,70 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   },
                                 ),
                                 
-                                const SizedBox(height: 32),
-                                
+                                const SizedBox(height: 16),
+
+// 分隔线和说明
+const Divider(height: 32, thickness: 1),
+ Text(
+  'Change Password',
+  style: TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+    color: Colors.blue[900],
+  ),
+),
+const SizedBox(height: 16),
+
+// 当前密码
+_buildTextField(
+  controller: _currentPasswordController,
+  label: 'Current Password',
+  icon: Icons.lock,
+  obscureText: true,
+),
+
+const SizedBox(height: 16),
+
+// 新密码
+_buildTextField(
+  controller: _newPasswordController,
+  label: 'New Password',
+  icon: Icons.lock_outline,
+  obscureText: true,
+  validator: (value) {
+    // 如果填了新密码，必须验证
+    if (_newPasswordController.text.isNotEmpty || 
+        _currentPasswordController.text.isNotEmpty) {
+      if (value == null || value.isEmpty) {
+        return 'Please enter new password';
+      }
+      if (value.length < 6) {
+        return 'Password must be at least 6 characters';
+      }
+    }
+    return null;
+  },
+),
+
+const SizedBox(height: 16),
+
+// 确认新密码
+_buildTextField(
+  controller: _confirmPasswordController,
+  label: 'Confirm New Password',
+  icon: Icons.lock_outline,
+  obscureText: true,
+  validator: (value) {
+    if (_newPasswordController.text.isNotEmpty) {
+      if (value != _newPasswordController.text) {
+        return 'Passwords do not match';
+      }
+    }
+    return null;
+  },
+),
+        const SizedBox(height:32),
+
                                 // 保存按钮
                                 SizedBox(
                                   width: double.infinity,
@@ -752,11 +858,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
     TextInputType? keyboardType,
     String? Function(String?)? validator,
     int maxLines = 1,
+    bool enabled= true,
+    bool obscureText = false,
   }) {
     return TextFormField(
       controller: controller,
+      enabled:enabled,
+      obscureText: obscureText,
       keyboardType: keyboardType,
-      maxLines: maxLines,
+      maxLines: obscureText ? 1 : maxLines,
       validator: validator,
       decoration: InputDecoration(
         labelText: label,

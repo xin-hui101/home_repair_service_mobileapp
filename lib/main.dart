@@ -7,7 +7,7 @@ import 'package:home_service_system/firebase_service/booking_service.dart';
 import 'package:home_service_system/firebase_service/technician_service.dart';
 import 'package:home_service_system/firebase_service/technician_booking_service.dart';
 import 'package:home_service_system/firebase_service/quotation_service.dart';
-// ❌ 不需要在这里导入 FCM Service
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,10 +19,6 @@ void main() async {
     print('❌ Firebase initialization failed: $e');
   }
 
-  // ❌ 不要在这里初始化 FCM
-  // 原因：用户还没有登录，我们不知道 userType 和 userId
-  // ✅ FCM 会在用户/技术员登录后自动初始化
-  
   runApp(MyApp());
 }
 

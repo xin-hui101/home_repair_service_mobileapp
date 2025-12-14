@@ -499,118 +499,124 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   // Show logout confirmation dialog
-  void _showLogoutDialog(AuthService authService) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            padding: EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 20,
-                  offset: Offset(0, 10),
+void _showLogoutDialog(AuthService authService) {
+  showDialog(
+    context: context,
+    barrierDismissible: true,
+    builder: (BuildContext dialogContext) {  // 使用不同的变量名
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 20,
+                offset: Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icon with animated container
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.red[50],
+                  shape: BoxShape.circle,
                 ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Icon with animated container
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.red[50],
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.logout_rounded,
-                    size: 40,
-                    color: Colors.red[600],
-                  ),
+                child: Icon(
+                  Icons.logout_rounded,
+                  size: 40,
+                  color: Colors.red[600],
                 ),
-                
-                SizedBox(height: 20),
-                
-                // Title
-                Text(
-                  'Sign Out',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[800],
-                  ),
+              ),
+              
+              SizedBox(height: 20),
+              
+              // Title
+              Text(
+                'Sign Out',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[800],
                 ),
-                
-                SizedBox(height: 12),
-                
-                // Subtitle
-                Text(
-                  'Are you sure you want to sign out from your account?',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                    height: 1.4,
-                  ),
+              ),
+              
+              SizedBox(height: 12),
+              
+              // Subtitle
+              Text(
+                'Are you sure you want to sign out from your account?',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                  height: 1.4,
                 ),
-                
-                SizedBox(height: 30),
-                
-                // Action buttons
-                Row(
-                  children: [
-                    // Cancel button
-                    Expanded(
-                      child: Container(
-                        height: 50,
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1.5,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            backgroundColor: Colors.white,
+              ),
+              
+              SizedBox(height: 30),
+              
+              // Action buttons
+              Row(
+                children: [
+                  // Cancel button
+                  Expanded(
+                    child: Container(
+                      height: 50,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.5,
                           ),
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[700],
-                            ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          backgroundColor: Colors.white,
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[700],
                           ),
                         ),
                       ),
                     ),
-                    
-                    SizedBox(width: 12),
-                    
-                    // Logout button
-                    Expanded(
-                      child: Container(
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            Navigator.pop(context); // Close dialog
-                            
-                            try {
-                              // Show modern loading indicator
-                              showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (context) => Dialog(
+                  ),
+                  
+                  SizedBox(width: 12),
+                  
+                  // Logout button
+                  Expanded(
+                    child: Container(
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          // 立即关闭对话框
+                          Navigator.pop(dialogContext);
+                          
+                          // 使用 mounted 检查
+                          if (!mounted) return;
+                          
+                          try {
+                            // 显示加载指示器
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext loadingContext) => WillPopScope(
+                                onWillPop: () async => false,
+                                child: Dialog(
                                   backgroundColor: Colors.transparent,
                                   child: Container(
                                     padding: EdgeInsets.all(32),
@@ -638,81 +644,101 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     ),
                                   ),
                                 ),
-                              );
-                              
-                              await authService.signOut();
-                              
-                              // Close loading indicator
-                              Navigator.pop(context);
-                              
-                              // Navigate to welcome page and clear all previous pages
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(builder: (context) => WelcomePage()),
-                                (route) => false,
-                              );
+                              ),
+                            );
+                            
+                            // 执行登出
+                            await authService.signOut();
+                            
+                            // 检查 widget 是否还存在
+                            if (!mounted) return;
+                            
+                            // 关闭加载指示器 - 使用 Navigator.of(context)
+                            Navigator.of(context, rootNavigator: true).pop();
+                            
+                            // 再次检查
+                            if (!mounted) return;
+                            
+                            // 导航到欢迎页面
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(builder: (context) => WelcomePage()),
+                              (route) => false,
+                            );
+                            
+                          } catch (e) {
+                            print('Logout error: $e');
+                            
+                            // 检查 widget 是否还存在
+                            if (!mounted) return;
+                            
+                            // 尝试关闭加载指示器
+                            try {
+                              Navigator.of(context, rootNavigator: true).pop();
                             } catch (e) {
-                              // Close loading indicator
-                              Navigator.pop(context);
-                              
-                              // Show modern error message
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.error_outline,
-                                        color: Colors.white,
-                                        size: 20,
-                                      ),
-                                      SizedBox(width: 12),
-                                      Expanded(
-                                        child: Text(
-                                          'Failed to sign out. Please try again.',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                              print('Error closing loading dialog: $e');
+                            }
+                            
+                            // 再次检查
+                            if (!mounted) return;
+                            
+                            // 显示错误消息
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.error_outline,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                    SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        'Failed to sign out. Please try again.',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                  backgroundColor: Colors.red[600],
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  margin: EdgeInsets.all(16),
-                                  duration: Duration(seconds: 4),
+                                    ),
+                                  ],
                                 ),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red[600],
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                                backgroundColor: Colors.red[600],
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                margin: EdgeInsets.all(16),
+                                duration: Duration(seconds: 4),
+                              ),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red[600],
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Text(
-                            'Sign Out',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
+                        ),
+                        child: Text(
+                          'Sign Out',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
 }

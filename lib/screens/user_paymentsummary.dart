@@ -340,7 +340,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
               Text('Generating PDF...'),
             ],
           ),
-          backgroundColor: Colors.blue[700],
+          backgroundColor: Colors.yellow[800],
           duration: const Duration(seconds: 3),
         ),
       );
@@ -585,6 +585,7 @@ Future<pw.Document> _generatePDF() async {
 
   pw.Widget _buildPDFSection(String title, List<pw.Widget> children) {
     return pw.Container(
+      width: double.infinity, 
       padding: const pw.EdgeInsets.all(16),
       decoration: pw.BoxDecoration(
         border: pw.Border.all(color: PdfColors.grey300),
@@ -801,7 +802,7 @@ Future<File?> _savePDF(pw.Document pdf) async {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _quotation != null ? _downloadQuotation : null,
-                icon: const Icon(Icons.download),
+                icon: Icon(Icons.download,color: Colors.amber[600]), 
                 label: const Text('Download Quotation'),
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,
